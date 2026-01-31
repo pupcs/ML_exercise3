@@ -1,3 +1,8 @@
 __pycache__/
 venv/
 .venv/
+
+datasets/*
+results/*
+__pycache__/
+*.pth
