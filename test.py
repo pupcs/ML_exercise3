@@ -38,8 +38,8 @@ if __name__ == '__main__':
     image = image.resize((image_width, image_height), resample=pil_image.BICUBIC)
     image = image.resize((image.width // args.scale, image.height // args.scale), resample=pil_image.BICUBIC)
     image = image.resize((image.width * args.scale, image.height * args.scale), resample=pil_image.BICUBIC)
-    base = args.image_file.split("/")[-1].split(".")[0]
-    image.save(args.image_file.replace('.', f"{base}_bicubic_x{args.scale}."))
+    base = args.image_file.rsplit('.', 1)
+    image.save(f"{base[0]}_bicubic_x{args.scale}.{base[1]}")
     
     image = np.array(image).astype(np.float32)
     ycbcr = convert_rgb_to_ycbcr(image)
