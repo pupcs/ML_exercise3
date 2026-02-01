@@ -14,6 +14,7 @@ if __name__ == '__main__':
     parser.add_argument('--weights-file', type=str, required=True)
     parser.add_argument('--image-file', type=str, required=True)
     parser.add_argument('--scale', type=int, default=3)
+    parser.add_argument('--output-dir', default='test_outputs')
     args = parser.parse_args()
 
     cudnn.benchmark = True
@@ -37,8 +38,9 @@ if __name__ == '__main__':
     image = image.resize((image_width, image_height), resample=pil_image.BICUBIC)
     image = image.resize((image.width // args.scale, image.height // args.scale), resample=pil_image.BICUBIC)
     image = image.resize((image.width * args.scale, image.height * args.scale), resample=pil_image.BICUBIC)
-    image.save(args.image_file.replace('.', '_bicubic_x{}.'.format(args.scale)))
-
+    base = args.image_file.split("/")[-1].split(".")[0]
+    image.save(args.image_file.replace('.', f"{base}_bicubic_x{args.scale}.jpg"))
+    
     image = np.array(image).astype(np.float32)
     ycbcr = convert_rgb_to_ycbcr(image)
 
