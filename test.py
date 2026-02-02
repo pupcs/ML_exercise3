@@ -35,7 +35,7 @@ if __name__ == '__main__':
 
     hr_width = (hr_image.width // args.scale) * args.scale
     hr_height = (hr_image.height // args.scale) * args.scale
-    hr_image = hr_image.resize((hr_image_width, hr_image_height), resample=pil_image.BICUBIC)
+    hr_image = hr_image.resize((hr_width, hr_height), resample=pil_image.BICUBIC)
     
     lr_image = hr_image.resize((hr_image.width // args.scale, hr_image.height // args.scale), resample=pil_image.BICUBIC)
     lr_image = lr_image.resize((hr_image.width * args.scale, hr_image.height * args.scale), resample=pil_image.BICUBIC)
