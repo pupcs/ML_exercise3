@@ -38,7 +38,7 @@ if __name__ == '__main__':
     hr_image = hr_image.resize((hr_width, hr_height), resample=pil_image.BICUBIC)
     
     lr_image = hr_image.resize((hr_width // args.scale, hr_height // args.scale), resample=pil_image.BICUBIC)
-    lr_image = lr_image.resize((hr_width * args.scale, hr_height * args.scale), resample=pil_image.BICUBIC)
+    lr_image = lr_image.resize((hr_width, hr_height), resample=pil_image.BICUBIC)
     name, ext = args.image_file.rsplit('.', 1)
     lr_image.save(f"{name}_lowRes_x{args.scale}.{ext}")
     
