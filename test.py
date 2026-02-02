@@ -31,28 +31,36 @@ if __name__ == '__main__':
 
     model.eval()
 
-    image = pil_image.open(args.image_file).convert('RGB')
+    hr_image = pil_image.open(args.image_file).convert('RGB')
 
-    image_width = (image.width // args.scale) * args.scale
-    image_height = (image.height // args.scale) * args.scale
-    image = image.resize((image_width, image_height), resample=pil_image.BICUBIC)
-    image = image.resize((image.width // args.scale, image.height // args.scale), resample=pil_image.BICUBIC)
-    image = image.resize((image.width * args.scale, image.height * args.scale), resample=pil_image.BICUBIC)
-    base = args.image_file.split("/")[-1].rsplit('.', 1)
-    image.save(f"{base[0]}_bicubic_x{args.scale}.{base[1]}")
+    hr_width = (hr_image.width // args.scale) * args.scale
+    hr_height = (hr_image.height // args.scale) * args.scale
+    hr_image = image.resize((hr_image_width, hr_image_height), resample=pil_image.BICUBIC)
     
-    image = np.array(image).astype(np.float32)
-    ycbcr = convert_rgb_to_ycbcr(image)
+    lr_image = hr_image.resize((hr_image.width // args.scale, hr_image.height // args.scale), resample=pil_image.BICUBIC)
+    lr_image = lr_image.resize((hr_image.width * args.scale, hr_image.height * args.scale), resample=pil_image.BICUBIC)
+    name, ext = args.image_file.rsplit('.', 1)
+    lr_image.save(f"{name}_lowRes_x{args.scale}.{ext}")
+    
+    lr_np = np.array(lr_image).astype(np.float32)
+    ycbcr = convert_rgb_to_ycbcr(lr_np)
 
     y = ycbcr[..., 0]
     y /= 255.
     y = torch.from_numpy(y).to(device)
     y = y.unsqueeze(0).unsqueeze(0)
 
+    hr_np = np.array(hr_image).astype(np.float32)
+    hr_ycbcr = convert_rgb_to_ycbcr(hr_np)
+    
+    hr_y = hr_ycbcr[..., 0] / 255.0
+    hr_y = torch.from_numpy(hr_y).to(device)
+    hr_y = hr_y.unsqueeze(0).unsqueeze(0)
+
     with torch.no_grad():
         preds = model(y).clamp(0.0, 1.0)
 
-    psnr = calc_psnr(y, preds)
+    psnr = calc_psnr(hr_y, preds)
     print('PSNR: {:.2f}'.format(psnr))
 
     preds = preds.mul(255.0).cpu().numpy().squeeze(0).squeeze(0)
