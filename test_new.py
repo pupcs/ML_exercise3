@@ -87,7 +87,7 @@ if __name__ == '__main__':
             output.save(srcnn_path)
 
     print(type(psnrs))
-    psnrs_arr = np.array([p.cpu().numpy() for p in psnrs])
+    psrns_arr = np.array([p.cpu().numpy() for p in psnrs])
     avg_psnr = np.mean(psrns_arr)
     std_psnr = np.std(psrns_arr)
     print('avg PSNR: {:.2f}'.format(avg_psnr))
@@ -98,6 +98,7 @@ if __name__ == '__main__':
     std_l2_norm = np.std(l2_norms_arr)
     print('avg L2 Norm: {:.2f}'.format(avg_l2_norm))
     print('std L2 Norm: {:.2f}'.format(std_l2_norm))
+
 
 
 
