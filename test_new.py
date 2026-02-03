@@ -37,18 +37,18 @@ if __name__ == '__main__':
     max_save = 10
     psnrs = []
     l2_norms = []
-    for i, image_path in enumerate(sorted(glob.glob('{}/*'.format(args.images_dir)))):
+    for i, image_file in enumerate(sorted(glob.glob('{}/*'.format(args.images_dir)))):
 
         hr_image = pil_image.open(args.image_file).convert('RGB')
 
         hr_width = (hr_image.width // args.scale) * args.scale
         hr_height = (hr_image.height // args.scale) * args.scale
         hr_image = hr_image.resize((hr_width, hr_height), resample=pil_image.BICUBIC)
+
         
         lr_image = hr_image.resize((hr_width // args.scale, hr_height // args.scale), resample=pil_image.BICUBIC)
         lr_image = lr_image.resize((hr_width, hr_height), resample=pil_image.BICUBIC)
         name, ext = args.image_file.rsplit('.', 1)
-        lr_image.save(f"{name}_lowRes_x{args.scale}.{ext}")
         
         lr_np = np.array(lr_image).astype(np.float32)
         ycbcr = convert_rgb_to_ycbcr(lr_np)
@@ -75,15 +75,15 @@ if __name__ == '__main__':
 
         output = np.array([preds, ycbcr[..., 1], ycbcr[..., 2]]).transpose([1, 2, 0])
         output = np.clip(convert_ycbcr_to_rgb(output), 0.0, 255.0).astype(np.uint8)
-        l2_norm = calc_l2_norm(input_np, output)
+        l2_norm = calc_l2_norm(hr_image, output)
         print('L2 Norm: {:.2f}'.format(l2_norm))
         l2_norms.append(l2_norm)
         output = pil_image.fromarray(output)
         if i < max_save:
-            bicubic_path = Path("outputs/scaled_down") / f"{Path(image_path).stem}_bicubic_x{args.scale}{Path(image_path).suffix}"
+            bicubic_path = Path("outputs/scaled_down") / f"{Path(image_file).stem}_lowRes_x{args.scale}{Path(image_file).suffix}"
             image.save(bicubic_path)
         
-            srcnn_path = Path("outputs/scaled_up") / f"{Path(image_path).stem}_srcnn_x{args.scale}{Path(image_path).suffix}"
+            srcnn_path = Path("outputs/scaled_up") / f"{Path(image_file).stem}_Upscaled_x{args.scale}{Path(image_file).suffix}"
             output.save(srcnn_path)
 
     psrns_arr = np.array(psnrs)
@@ -93,3 +93,4 @@ if __name__ == '__main__':
     l2_norms_arr = np.array(l2_norms)
     avg_l2_norm = np.mean(l2_norms_arr)
     print('avg L2 Norm: {:.2f}'.format(avg_l2_norm))
+
