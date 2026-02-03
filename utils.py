@@ -50,6 +50,14 @@ def convert_ycbcr_to_rgb(img):
 def calc_psnr(img1, img2):
     return 10. * torch.log10(1. / torch.mean((img1 - img2) ** 2))
 
+def calc_l2_norm(img1, img2):
+    # Check shapes
+    if img1.shape != img2.shape:
+        raise ValueError(f"Images must have the same shape, got {img1.shape} and {img2.shape}")
+    
+    # Compute L2 norm
+    return np.linalg.norm(img1 - img2)
+
 
 class AverageMeter(object):
     def __init__(self):
