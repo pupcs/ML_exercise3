@@ -13,9 +13,8 @@ from utils import convert_rgb_to_ycbcr, convert_ycbcr_to_rgb, calc_psnr
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--weights-file', type=str, required=True)
-    parser.add_argument('--image-file', type=str, required=True)
+    parser.add_argument('--images-dir', type=str, required=True)
     parser.add_argument('--scale', type=int, default=3)
-    parser.add_argument('--output-dir', default='test_outputs')
     args = parser.parse_args()
 
     cudnn.benchmark = True
@@ -88,9 +87,14 @@ if __name__ == '__main__':
 
     psrns_arr = np.array(psnrs)
     avg_psnr = np.mean(psrns_arr)
+    std_psnr = np.std(psrns_arr)
     print('avg PSNR: {:.2f}'.format(avg_psnr))
+    print('std PSNR: {:.2f}'.format(std_psnr))
     
     l2_norms_arr = np.array(l2_norms)
     avg_l2_norm = np.mean(l2_norms_arr)
+    std_l2_norm = np.std(l2_norms_arr)
     print('avg L2 Norm: {:.2f}'.format(avg_l2_norm))
+    print('std L2 Norm: {:.2f}'.format(std_l2_norm))
+
 
