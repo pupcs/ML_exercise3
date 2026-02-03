@@ -38,7 +38,7 @@ if __name__ == '__main__':
     l2_norms = []
     for i, image_file in enumerate(sorted(glob.glob('{}/*'.format(args.images_dir)))):
 
-        hr_image = pil_image.open(args.image_file).convert('RGB')
+        hr_image = pil_image.open(image_file).convert('RGB')
 
         hr_width = (hr_image.width // args.scale) * args.scale
         hr_height = (hr_image.height // args.scale) * args.scale
@@ -47,7 +47,7 @@ if __name__ == '__main__':
         
         lr_image = hr_image.resize((hr_width // args.scale, hr_height // args.scale), resample=pil_image.BICUBIC)
         lr_image = lr_image.resize((hr_width, hr_height), resample=pil_image.BICUBIC)
-        name, ext = args.image_file.rsplit('.', 1)
+        name, ext = image_file.rsplit('.', 1)
         
         lr_np = np.array(lr_image).astype(np.float32)
         ycbcr = convert_rgb_to_ycbcr(lr_np)
@@ -96,5 +96,6 @@ if __name__ == '__main__':
     std_l2_norm = np.std(l2_norms_arr)
     print('avg L2 Norm: {:.2f}'.format(avg_l2_norm))
     print('std L2 Norm: {:.2f}'.format(std_l2_norm))
+
 
 
