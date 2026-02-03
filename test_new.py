@@ -43,7 +43,7 @@ if __name__ == '__main__':
         hr_width = (hr_image.width // args.scale) * args.scale
         hr_height = (hr_image.height // args.scale) * args.scale
         hr_image = hr_image.resize((hr_width, hr_height), resample=pil_image.BICUBIC)
-
+        hr_np = np.array(hr_image).astype(np.float32)
         
         lr_image = hr_image.resize((hr_width // args.scale, hr_height // args.scale), resample=pil_image.BICUBIC)
         lr_image = lr_image.resize((hr_width, hr_height), resample=pil_image.BICUBIC)
@@ -74,7 +74,7 @@ if __name__ == '__main__':
 
         output = np.array([preds, ycbcr[..., 1], ycbcr[..., 2]]).transpose([1, 2, 0])
         output = np.clip(convert_ycbcr_to_rgb(output), 0.0, 255.0).astype(np.uint8)
-        l2_norm = calc_l2_norm(hr_image, output)
+        l2_norm = calc_l2_norm(hr_np, output)
         print('L2 Norm: {:.2f}'.format(l2_norm))
         l2_norms.append(l2_norm)
         output = pil_image.fromarray(output)
@@ -96,6 +96,7 @@ if __name__ == '__main__':
     std_l2_norm = np.std(l2_norms_arr)
     print('avg L2 Norm: {:.2f}'.format(avg_l2_norm))
     print('std L2 Norm: {:.2f}'.format(std_l2_norm))
+
 
 
 
