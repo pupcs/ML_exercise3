@@ -35,8 +35,11 @@ if __name__ == '__main__':
     os.makedirs("outputs/scaled_up", exist_ok=True)
     
     max_save = 10
-    psnrs = []
-    l2_norms = []
+    psnrs_predvsoriginal = []
+    l2_norms_predvsoriginal = []
+    
+    psnrs_downscaledvsoriginal = []
+    l2_norms_downscaledvsoriginal = []
     for i, image_file in enumerate(sorted(glob.glob('{}/*'.format(args.images_dir)))):
 
         hr_image = pil_image.open(image_file).convert('RGB')
@@ -69,16 +72,25 @@ if __name__ == '__main__':
             preds = model(y).clamp(0.0, 1.0)
 
         psnr = calc_psnr(hr_y, preds)
-        print('PSNR: {:.2f}'.format(psnr))
-        psnrs.append(psnr)
+        #print('PSNR: {:.2f}'.format(psnr))
+        psnrs_predvsoriginal.append(psnr)
+        
+        psnr = calc_psnr(hr_y, y)
+        psnrs_downscaledvsoriginal.append(psnr)
+        
         preds = preds.mul(255.0).cpu().numpy().squeeze(0).squeeze(0)
 
         output = np.array([preds, ycbcr[..., 1], ycbcr[..., 2]]).transpose([1, 2, 0])
         output = np.clip(convert_ycbcr_to_rgb(output), 0.0, 255.0).astype(np.uint8)
+        
         l2_norm = calc_l2_norm(hr_np, output)
-        print('L2 Norm: {:.2f}'.format(l2_norm))
-        l2_norms.append(l2_norm)
+        #print('L2 Norm: {:.2f}'.format(l2_norm))
+        l2_norms_predvsoriginal.append(l2_norm)
         output = pil_image.fromarray(output)
+        
+        l2_norm = calc_l2_norm(hr_np, lr_np)
+        l2_norms_downscaledvsoriginal.append(l2_norm)
+        
         if i < max_save:
             bicubic_path = Path("outputs/scaled_down") / f"{Path(image_file).stem}_lowRes_x{args.scale}{Path(image_file).suffix}"
             lr_image.save(bicubic_path)
@@ -86,18 +98,30 @@ if __name__ == '__main__':
             srcnn_path = Path("outputs/scaled_up") / f"{Path(image_file).stem}_Upscaled_x{args.scale}{Path(image_file).suffix}"
             output.save(srcnn_path)
 
-    print(type(psnrs))
-    psrns_arr = np.array([p.cpu().numpy() for p in psnrs])
+    #print(type(psnrs))
+    psrns_arr = np.array([p.cpu().numpy() for p in psnrs_predvsoriginal])
     avg_psnr = np.mean(psrns_arr)
     std_psnr = np.std(psrns_arr)
-    print('avg PSNR: {:.2f}'.format(avg_psnr))
-    print('std PSNR: {:.2f}'.format(std_psnr))
+    print('avg PSNR upscaled vs original: {:.2f}'.format(avg_psnr))
+    print('std PSNR upscaled vs original: {:.2f}'.format(std_psnr))
+    
+    psrns_arr = np.array([p.cpu().numpy() for p in psnrs_downscaledvsoriginal])
+    avg_psnr = np.mean(psrns_arr)
+    std_psnr = np.std(psrns_arr)
+    print('avg PSNR downscaled vs original: {:.2f}'.format(avg_psnr))
+    print('std PSNR downscaled vs original: {:.2f}'.format(std_psnr))
 
-    l2_norms_arr = np.array(l2_norms)
+    l2_norms_arr = np.array(l2_norms_predvsoriginal)
     avg_l2_norm = np.mean(l2_norms_arr)
     std_l2_norm = np.std(l2_norms_arr)
-    print('avg L2 Norm: {:.2f}'.format(avg_l2_norm))
-    print('std L2 Norm: {:.2f}'.format(std_l2_norm))
+    print('avg L2 Norm upscaled vs original: {:.2f}'.format(avg_l2_norm))
+    print('std L2 Norm upscaled vs original: {:.2f}'.format(std_l2_norm))
+    
+    l2_norms_arr = np.array(l2_norms_downscaledvsoriginal)
+    avg_l2_norm = np.mean(l2_norms_arr)
+    std_l2_norm = np.std(l2_norms_arr)
+    print('avg L2 Norm downscaled vs original: {:.2f}'.format(avg_l2_norm))
+    print('std L2 Norm downscaled vs original: {:.2f}'.format(std_l2_norm))
 
 
 
