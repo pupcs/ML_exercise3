@@ -86,17 +86,20 @@ if __name__ == '__main__':
             srcnn_path = Path("outputs/scaled_up") / f"{Path(image_file).stem}_Upscaled_x{args.scale}{Path(image_file).suffix}"
             output.save(srcnn_path)
 
+    psnrs.cpu()
     psrns_arr = np.array(psnrs)
     avg_psnr = np.mean(psrns_arr)
     std_psnr = np.std(psrns_arr)
     print('avg PSNR: {:.2f}'.format(avg_psnr))
     print('std PSNR: {:.2f}'.format(std_psnr))
-    
+
+    l2_norms.cpu()
     l2_norms_arr = np.array(l2_norms)
     avg_l2_norm = np.mean(l2_norms_arr)
     std_l2_norm = np.std(l2_norms_arr)
     print('avg L2 Norm: {:.2f}'.format(avg_l2_norm))
     print('std L2 Norm: {:.2f}'.format(std_l2_norm))
+
 
 
 
