@@ -81,7 +81,7 @@ if __name__ == '__main__':
         output = pil_image.fromarray(output)
         if i < max_save:
             bicubic_path = Path("outputs/scaled_down") / f"{Path(image_file).stem}_lowRes_x{args.scale}{Path(image_file).suffix}"
-            image.save(bicubic_path)
+            lr_image.save(bicubic_path)
         
             srcnn_path = Path("outputs/scaled_up") / f"{Path(image_file).stem}_Upscaled_x{args.scale}{Path(image_file).suffix}"
             output.save(srcnn_path)
@@ -97,6 +97,7 @@ if __name__ == '__main__':
     std_l2_norm = np.std(l2_norms_arr)
     print('avg L2 Norm: {:.2f}'.format(avg_l2_norm))
     print('std L2 Norm: {:.2f}'.format(std_l2_norm))
+
 
 
 
